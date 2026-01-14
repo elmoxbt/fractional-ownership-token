@@ -523,7 +523,8 @@ const VeTokenApp: FC = () => {
             <div className="form-group">
               <label>Lock Duration (days)</label>
               <select value={lockDuration} onChange={(e) => setLockDuration(e.target.value)}>
-                <option value="7">7 days (1x multiplier)</option>
+                <option value="1">1 day</option>
+                <option value="7">7 days</option>
                 <option value="30">30 days</option>
                 <option value="90">90 days</option>
                 <option value="180">180 days</option>
