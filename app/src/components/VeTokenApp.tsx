@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js';
 import * as anchor from '@coral-xyz/anchor';
 import { Program, AnchorProvider, Idl } from '@coral-xyz/anchor';
 import { TOKEN_2022_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction } from '@solana/spl-token';
-import idl from '../../../target/idl/solana_fractional_ownership_token.json';
+import idl from '../idl.json';
 
 const PROGRAM_ID = new PublicKey(idl.address);
 const IDL = idl as Idl;
