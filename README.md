@@ -87,87 +87,71 @@ After expiry, users withdraw locked tokens. veTokens are burned.
 ### Architectural Diagram
 
 ```
-                    ┌──────────────────────────────────────┐
-                    │  USERS (Wallet Adapters)             │
-                    │  User A   User B   User C            │
-                    └──────────────┬───────────────────────┘
-                                   │
-                                   ▼
-        ┌──────────────────────────────────────────────────────────┐
-        │         FRONTEND - React + TypeScript + Vite             │
-        │                  (Vercel Deployment)                     │
-        │                                                          │
-        │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐     │
-        │  │Lock      │ │Claim     │ │Extend    │ │Unlock    │     │
-        │  │Tokens    │ │Fees      │ │Lock      │ │Tokens    │     │
-        │  └──────────┘ └──────────┘ └──────────┘ └──────────┘     │
-        └──────────────────────┬───────────────────────────────────┘
-                               │ @coral-xyz/anchor SDK
-                               ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│              SOLANA PROGRAM (Anchor Framework)                       │
-│       Program ID: 5xjnSTgkKABxfbBz5wtfWb2ye17piZo7ad5UBFuFybzQ       │
-│                                                                      │
-│  ┌────────────────────────────────────────────────────────────────┐  │
-│  │                  PROGRAM INSTRUCTIONS                          │  │
-│  │                                                                │  │
-│  │  initialize()   lock_tokens()   unlock_tokens()   claim_fees() │  │
-│  │  deposit_fees() extend_lock()   increase_lock()                │  │
-│  └────────────────────────────────────────────────────────────────┘  │
-│                                                                      │
-│  ┌──────────────────────┐        ┌──────────────────────────────┐    │
-│  │ STATE ACCOUNTS (PDAs)│        │  TOKEN ACCOUNTS (Token-2022) │    │
-│  │                      │        │                              │    │
-│  │  ┌────────────────┐ │        │  ┌────────────────────────┐        │
-│  │  │ GlobalState    │─┼────────┼─▶│ Token Vault (PDA)      │       │
-│  │  │ • total_locked │ │        │  │ Locked base tokens     │        │
-│  │  │ • total_ve_    │ │        │  └────────────────────────┘        │
-│  │  │   supply       │ │        │                                    │
-│  │  │ • cumulative_  │◀┼────────┼──┐                                │
-│  │  │   fee_per_ve   │ │        │  │ ┌────────────────────────┐      │
-│  │  │ • authority    │ │        │  │ │ Fee Vault (PDA)        │      │
-│  │  └────────────────┘ │        │  └─│ Claimable protocol fees│      │
-│  │        │            │        │    └────────────────────────┘      │
-│  │        ▼            │        │                                    │
-│  │  ┌────────────────┐ │        │  ┌────────────────────────┐        │
-│  │  │ UserLock A     │ │        │  │ veToken Mint           │        │
-│  │  │ • locked_amount│─┼────────┼─▶│ Minted to users        │       │
-│  │  │ • unlock_time  │ │        │  │ (time-weighted)        │        │
-│  │  │ • initial_ve   │ │        │  └────────────────────────┘        │
-│  │  │ • fee_debt     │ │        │                                    │
-│  │  └────────────────┘ │        │  ┌────────────────────────┐        │
-│  │                     │        │  │ Base Token Mint        │        │
-│  │  ┌────────────────┐ │        │  │ (User deposits)        │        │
-│  │  │ UserLock B     │ │        │  └────────────────────────┘        │
-│  │  └────────────────┘ │        │                              │     │
-│  │                     │        └──────────────────────────────┘     │
-│  │  ┌────────────────┐ │                                             │
-│  │  │ UserLock C     │ │                                             │
-│  │  └────────────────┘ │                                             │
-│  └──────────────────────┘                                            │
-└──────────────────────────────────────────────────────────────────────┘
+                         USERS (Wallet Adapters)
+                       User A   User B   User C
+                                  |
+                                  v
+                  FRONTEND - React + TypeScript + Vite
+                         (Vercel Deployment)
+
+              Lock Tokens | Claim Fees | Extend Lock | Unlock Tokens
+                                  |
+                        @coral-xyz/anchor SDK
+                                  |
+                                  v
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           SOLANA PROGRAM (Anchor Framework)
+    Program ID: 5xjnSTgkKABxfbBz5wtfWb2ye17piZo7ad5UBFuFybzQ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                     PROGRAM INSTRUCTIONS
+   initialize()   lock_tokens()   unlock_tokens()   claim_fees()
+   deposit_fees() extend_lock()   increase_lock()
+
+─────────────────────────────────────────────────────────────────────
+
+   STATE ACCOUNTS (PDAs)              TOKEN ACCOUNTS (Token-2022)
+
+   GlobalState                        Token Vault (PDA)
+   • total_locked                     Holds locked base tokens
+   • total_ve_supply
+   • cumulative_fee_per_ve_token      Fee Vault (PDA)
+   • authority                        Holds claimable protocol fees
+       |
+       v                              veToken Mint
+   UserLock A                         Minted to users (time-weighted)
+   • locked_amount
+   • unlock_time                      Base Token Mint
+   • initial_ve_amount                User deposits
+   • fee_debt
+
+   UserLock B
+
+   UserLock C
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 KEY FLOWS:
-──────────
+
 1. LOCK
    User → Transfer base tokens → Token Vault
-       └→ Mint veTokens (time-weighted) → User veToken account
-       └→ Update UserLock (amount, unlock_time, fee_debt)
-       └→ Update GlobalState (total_locked, total_ve_supply)
+       → Mint veTokens (time-weighted) → User veToken account
+       → Update UserLock (amount, unlock_time, fee_debt)
+       → Update GlobalState (total_locked, total_ve_supply)
 
 2. DEPOSIT FEES (Authority only)
    Authority → Transfer fees → Fee Vault
-            └→ Update GlobalState.cumulative_fee_per_ve_token
+            → Update GlobalState.cumulative_fee_per_ve_token
 
 3. CLAIM
    User → Calculate: veTokens × (cumulative - fee_debt) / 1e18
-       └→ Transfer fees: Fee Vault → User
-       └→ Update UserLock.fee_debt = current cumulative
+       → Transfer fees: Fee Vault → User
+       → Update UserLock.fee_debt = current cumulative
 
 4. UNLOCK
    User → Burn veTokens
-       └→ Transfer: Token Vault → User
-       └→ Update UserLock (clear) + GlobalState (reduce totals)
+       → Transfer: Token Vault → User
+       → Update UserLock (clear) + GlobalState (reduce totals)
 ```
 
 ### Program Instructions
