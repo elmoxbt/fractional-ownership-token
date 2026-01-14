@@ -1,0 +1,36 @@
+{
+  "name": "solana-fractional-ownership-token",
+  "version": "1.0.0",
+  "description": "Fractional protocol ownership with veToken mechanics on Solana",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "app"
+  ],
+  "scripts": {
+    "test": "anchor test",
+    "build": "anchor build",
+    "deploy": "anchor build && ts-node scripts/deploy.ts",
+    "app:dev": "cd app && yarn dev",
+    "app:build": "cd app && yarn build",
+    "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.95.8"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5",
+    "@types/chai": "^4.3.19",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.10.5",
+    "chai": "^4.5.0",
+    "mocha": "^10.8.2",
+    "prettier": "^3.4.2",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
