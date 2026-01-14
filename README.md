@@ -33,8 +33,8 @@ A production-ready vote-escrowed token (veToken) system on Solana with cumulativ
 ### Deploy Program
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/solana-fractional-ownership-token.git
-cd solana-fractional-ownership-token
+git clone https://github.com/elmoxbt/fractional-ownership-token.git
+cd fractional-ownership-token
 
 # Install dependencies
 npm install
