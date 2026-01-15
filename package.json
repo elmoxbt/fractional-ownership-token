@@ -10,9 +10,9 @@
   "scripts": {
     "test": "anchor test",
     "build": "anchor build",
-    "deploy": "anchor build && ts-node scripts/deploy.ts",
-    "app:dev": "cd app && yarn dev",
-    "app:build": "cd app && yarn build",
+    "deploy": "ts-node scripts/deploy.ts",
+    "app:dev": "cd app && npm run dev",
+    "app:build": "cd app && npm run build",
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
   },
